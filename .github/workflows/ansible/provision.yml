@@ -1,0 +1,40 @@
+---
+- name: Provision environment
+  hosts: localhost
+  connection: local
+  tasks:
+    - name: Create log directory
+      file:
+        path: /tmp/app-logs
+        state: directory
+        mode: "0755"
+
+    - name: Create blue deployment directory
+      file:
+        path: /tmp/app-blue
+        state: directory
+        mode: "0755"
+
+    - name: Create green deployment directory
+      file:
+        path: /tmp/app-green
+        state: directory
+        mode: "0755"
+
+    - name: Install npm dependencies
+      command: npm ci
+      args:
+        chdir: "{{ playbook_dir }}/.."
+
+    - name: Make scripts executable
+      file:
+        path: "{{ item }}"
+        mode: "0755"
+      loop:
+        - "{{ playbook_dir }}/../scripts/deploy.sh"
+        - "{{ playbook_dir }}/../scripts/rollback.sh"
+        - "{{ playbook_dir }}/../scripts/healthcheck.sh"
+
+    - name: Confirm setup
+      debug:
+        msg: "✅ Environment provisioned successfully"
