@@ -18,3 +18,16 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm test
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: lint-and-test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci --omit=dev
+      - run: echo "✅ Deploy step - app would be deployed to production here"
